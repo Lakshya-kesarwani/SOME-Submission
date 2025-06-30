@@ -214,6 +214,38 @@
                 margin-top: 20px;
             }
         }
+        /* Code Tabs Styling */
+        .code-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #4b5563; /* border-gray-600 */
+        }
+        .tab-button {
+            padding: 0.75rem 1.25rem;
+            background-color: #1f2937; /* bg-gray-800 */
+            color: #9ca3af; /* text-gray-400 */
+            border: none;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-button:hover {
+            background-color: #374151; /* bg-gray-700 */
+            color: #d1d5db; /* text-gray-300 */
+        }
+        .tab-button.active-tab {
+            background-color: #374151; /* bg-gray-700 */
+            color: #38bdf8; /* text-sky-400 */
+            border-bottom-color: #38bdf8;
+        }
+        .code-content {
+            display: none;
+        }
+        .code-content.active-content {
+            display: block;
+        }
     </style>
 </head>
 
@@ -236,6 +268,8 @@
                             Tours</a>
                         <a href="#applications"
                             class="nav-link px-3 py-2 rounded-md text-sm font-medium">Applications</a>
+                            <a href="#code" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Code</a>
+
                     </div>
                 </div>
             </div>
@@ -458,7 +492,209 @@
                 </div>
             </div>
         </section>
+        <!-- Section 6: Code -->
+        <section id="code" class="content-section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h1 class="text-4xl font-bold text-center mb-8 text-white">Tour Validation Code</h1>
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8 mb-8">
+                    <p class="mb-4 text-lg">
+                        The following code snippets demonstrate how to validate if a given grid represents a valid
+                        Knight's Tour.
+                        These implementations check if the sequence of moves, starting from square 0 and incrementing,
+                        forms a
+                        continuous path where each move is a legal knight's move and every square is visited exactly
+                        once.
+                        The code assumes the `grid` is already populated with the tour sequence (0 to \(n^2-1\)).
+                    </p>
 
+                    <div class="code-tabs">
+                        <button class="tab-button active-tab" onclick="showCode('cpp')">C++</button>
+                        <button class="tab-button" onclick="showCode('python')">Python</button>
+                        <button class="tab-button" onclick="showCode('java')">Java</button>
+                    </div>
+
+                    <!-- C++ Code -->
+                    <div id="cpp-code-block" class="code-content active-content">
+                        <h2 class="text-2xl font-bold text-white mb-3 sr-only">C++</h2>
+                        <!-- sr-only to hide visual heading but keep for screen readers -->
+                        <pre class="bg-gray-900 text-gray-300 p-4 rounded-md text-sm overflow-auto"><code>
+#include &lt;vector&gt;
+
+class Solution {
+public:
+int n;
+int delrow[8] = {-2, -1, 1, 2, 2, 1, -1, -2};
+int delcol[8] = {-1, -2, -2, -1, 1, 2, 2, 1};
+
+bool isValid(int r, int c, std::vector<std::vector<int>>& grid, std::vector<std::vector<bool>>& visited, int step) {
+if (step == n * n - 1) {
+    return true;
+}
+
+visited[r][c] = true;
+
+for (int i = 0; i < 8; i++) {
+    int nrow = r + delrow[i];
+    int ncol = c + delcol[i];
+
+    if (nrow >= 0 && nrow < n && ncol >= 0 && ncol < n && !visited[nrow][ncol]) {
+        if (grid[nrow][ncol] == 1 + step) {
+            if (isValid(nrow, ncol, grid, visited, step + 1)) {
+                return true;
+            }
+        }
+    }
+}
+visited[r][c] = false;
+return false;
+}
+
+bool checkValidGrid(std::vector<std::vector<int>>& grid) {
+n = grid.size();
+
+if (n == 0) return true;
+if (n == 1) return grid[0][0] == 0;
+
+std::vector<std::vector<bool>> visited(n, std::vector<bool>(n, false));
+
+int startR = -1, startC = -1;
+for (int r = 0; r < n; ++r) {
+    for (int c = 0; c < n; ++c) {
+        if (grid[r][c] == 0) {
+            startR = r;
+            startC = c;
+            break;
+        }
+    }
+    if (startR != -1) break;
+}
+
+if (startR == -1) return false;
+
+return isValid(startR, startC, grid, visited, 0);
+}
+};
+                </code></pre>
+                    </div>
+
+                    <!-- Python Code -->
+                    <div id="python-code-block" class="code-content">
+                        <h2 class="text-2xl font-bold text-white mb-3 sr-only">Python</h2>
+                        <pre class="bg-gray-900 text-gray-300 p-4 rounded-md text-sm overflow-auto"><code>
+class Solution:
+def __init__(self):
+self.n = 0
+self.delrow = [-2, -1, 1, 2, 2, 1, -1, -2]
+self.delcol = [-1, -2, -2, -1, 1, 2, 2, 1]
+
+def is_valid_tour(self, r: int, c: int, grid: list[list[int]], visited: list[list[bool]], step: int) -> bool:
+if step == self.n * self.n - 1:
+    return True
+
+visited[r][c] = True
+
+for i in range(8):
+    nrow = r + self.delrow[i]
+    ncol = c + self.delcol[i]
+
+    if 0 <= nrow < self.n and 0 <= ncol < self.n and not visited[nrow][ncol]:
+        if grid[nrow][ncol] == 1 + step:
+            if self.is_valid_tour(nrow, ncol, grid, visited, step + 1):
+                return True
+
+visited[r][c] = False
+return False
+
+def checkValidGrid(self, grid: list[list[int]]) -> bool:
+self.n = len(grid)
+
+if self.n == 0:
+    return True
+if self.n == 1:
+    return grid[0][0] == 0
+
+visited = [[False for _ in range(self.n)] for _ in range(self.n)]
+
+start_r, start_c = -1, -1
+for r in range(self.n):
+    for c in range(self.n):
+        if grid[r][c] == 0:
+            start_r, start_c = r, c
+            break
+    if start_r != -1:
+        break
+
+if start_r == -1:
+    return False
+
+return self.is_valid_tour(start_r, start_c, grid, visited, 0)
+                </code></pre>
+                    </div>
+
+                    <!-- Java Code -->
+                    <div id="java-code-block" class="code-content">
+                        <h2 class="text-2xl font-bold text-white mb-3 sr-only">Java</h2>
+                        <pre class="bg-gray-900 text-gray-300 p-4 rounded-md text-sm overflow-auto"><code>
+import java.util.List;
+
+class Solution {
+private int n;
+private int[] delrow = {-2, -1, 1, 2, 2, 1, -1, -2};
+private int[] delcol = {-1, -2, -2, -1, 1, 2, 2, 1};
+
+private boolean isValid(int r, int c, List&lt;List&lt;Integer&gt;&gt; grid, boolean[][] visited, int step) {
+if (step == n * n - 1) {
+    return true;
+}
+
+visited[r][c] = true;
+
+for (int i = 0; i < 8; i++) {
+    int nrow = r + delrow[i];
+    int ncol = c + delcol[i];
+
+    if (nrow >= 0 && nrow < n && ncol >= 0 && ncol < n && !visited[nrow][ncol]) {
+        if (grid.get(nrow).get(ncol) == 1 + step) {
+            if (isValid(nrow, ncol, grid, visited, step + 1)) {
+                return true;
+            }
+        }
+    }
+}
+visited[r][c] = false;
+return false;
+}
+
+public boolean checkValidGrid(List&lt;List&lt;Integer&gt;&gt; grid) {
+n = grid.size();
+
+if (n == 0) return true;
+if (n == 1) return grid.get(0).get(0) == 0;
+
+boolean[][] visited = new boolean[n][n];
+
+int startR = -1, startC = -1;
+for (int r = 0; r < n; r++) {
+    for (int c = 0; c < n; c++) {
+        if (grid.get(r).get(c) == 0) {
+            startR = r;
+            startC = c;
+            break;
+        }
+    }
+    if (startR != -1) break;
+}
+
+if (startR == -1) return false;
+
+return isValid(startR, startC, grid, visited, 0);
+}
+}
+                </code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
         <!-- Section 4: Magic Tours -->
         <section id="magic" class="content-section">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -595,7 +831,7 @@
                         <li>
                             Brady Haran, <em>Knight's Tour - Numberphile</em>,
                             <a href="https://www.youtube.com/watch?v=ab_dY3dZFHM" target="_blank">YouTube</a>,
-                              published Jan 16, 2014.
+                            published Jan 16, 2014.
                         </li>
 
                     </ul>
@@ -826,6 +1062,28 @@
         document.addEventListener('DOMContentLoaded', () => {
             resetBoard();
         });
+
+        function showCode(language) {
+            // Hide all code contents
+            document.querySelectorAll('.code-content').forEach(content => {
+                content.classList.remove('active-content');
+            });
+            // Deactivate all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active-tab');
+            });
+
+            // Show the selected code content
+            document.getElementById(language + '-code-block').classList.add('active-content');
+            // Activate the clicked tab button
+            document.querySelector(`.tab-button[onclick="showCode('${language}')"]`).classList.add('active-tab');
+        }
+
+        // Initialize with C++ code active on load
+        document.addEventListener('DOMContentLoaded', () => {
+            showCode('cpp'); // This will set C++ as active by default
+        });
+
     </script>
 </body>
 
