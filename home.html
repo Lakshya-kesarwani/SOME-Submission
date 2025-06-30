@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Knight's Odyssey: A Mathematical Exposition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            /* bg-gray-900 */
+            color: #d1d5db;
+            /* text-gray-300 */
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Lora', serif;
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link.active {
+            color: #38bdf8;
+            /* text-sky-400 */
+            border-bottom-color: #38bdf8;
+        }
+
+        .nav-link:hover {
+            color: #7dd3fc;
+            /* text-sky-300 */
+            border-bottom-color: #7dd3fc;
+        }
+
+        .content-section {
+            padding-top: 5rem;
+            /* Offset for sticky nav */
+            margin-top: -5rem;
+            /* Negative margin to keep spacing correct */
+        }
+
+        .hero-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100;
+            transform: translateX(-50%) translateY(-50%);
+            background: url('./3.gif');
+            background-size: cover;
+            filter: brightness(0.3);
+        }
+
+        .accordion-header {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background-color: #374151;
+            /* bg-gray-700 */
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+
+        .math-formula {
+            font-family: 'Lora', serif;
+            font-size: 1.1rem;
+            color: #93c5fd;
+            /* text-blue-300 */
+            background-color: #1f2937;
+            /* bg-gray-800 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        /* game */
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 20px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-template-rows: repeat(8, 50px);
+            border: 2px solid white;
+        }
+
+        @media (max-width: 480px) {
+            .board {
+                grid-template-columns: repeat(8, 38px);
+                grid-template-rows: repeat(8, 38px);
+            }
+        }
+
+        .cell {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-family: sans-serif;
+        }
+
+        .light {
+            background-color: #f3f4f6;
+            color: black;
+        }
+
+        .dark {
+            background-color: #4b5563;
+            color: white;
+        }
+
+        .visited {
+            background-color: #facc15 !important;
+            color: black;
+        }
+
+        .knight {
+            background-color: #10b981 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .controls button {
+            padding: 10px 18px;
+            background-color: #3b82f6;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .controls button:hover {
+            background-color: #2563eb;
+        }
+
+        .references-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 12px;
+        }
+
+        .references-text {
+            flex: 1;
+            padding-right: 20px;
+        }
+
+        .youtube-embed {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .youtube-embed iframe {
+            width: 100%;
+            height: 250px;
+            max-width: 480px;
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        @media (max-width: 768px) {
+            .references-section {
+                flex-direction: column;
+            }
+
+            .youtube-embed {
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-white">Knight's Odyssey</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#home" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a href="#theory" class="nav-link px-3 py-2 rounded-md text-sm font-medium">The Theory</a>
+                        <a href="#solutions" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Solving the
+                            Tour</a>
+                        <a href="#magic" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Magic & Semi-Magic
+                            Tours</a>
+                        <a href="#applications"
+                            class="nav-link px-3 py-2 rounded-md text-sm font-medium">Applications</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Section 1: Home -->
+        <section id="home" class="content-section">
+            <div class="relative h-[80vh] min-h-[500px] flex items-center justify-center text-center overflow-hidden">
+                <div class="hero-video"></div>
+                <div class="relative z-10 px-4">
+                    <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-white">The Knight's Odyssey</h1>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-gray-300">A journey through discrete
+                        mathematics on an 8x8 chessboard.</p>
+                    <p class="mt-6 text-md text-gray-400">An Exposition for the Summer of Maths, IIT Gandhinagar</p>
+                    <p class="font-semibold text-sky-400">By Lakshya Kesarwani & Manan Chavda</p>
+                </div>
+            </div>
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">What is the Knight's Tour?</h2>
+                    <p class="mb-4 text-lg">The Knight's Tour is a classic mathematical puzzle involving a knight on a
+                        chessboard. The challenge is to move the knight, following its 'L'-shaped move, to every square
+                        on the board exactly once. A simple premise with a deep and fascinating connection to discrete
+                        mathematics.</p>
+                    <p class="mb-4">This problem can be classified into two main types: an <strong
+                            class="text-sky-400">open tour</strong>, where the knight ends on a square from which it
+                        cannot reach its starting square, and a <strong class="text-sky-400">closed tour</strong>, where
+                        the final square is a knight's move away from the starting square, forming a complete cycle.</p>
+
+                    <div class="my-8 flex justify-center">
+                        <video src="./1.mp4" type="video/mp4" autoplay loop
+                            onerror="this.onerror=null;this.src='https://placehold.co/400x400/1f2937/a0aec0?text=Animated+Closed+Tour';"
+                            alt="Knight's Tour Animation" class="rounded-lg shadow-lg">
+                    </div>
+
+                    <h3 class="text-2xl font-bold text-white mt-8 mb-4">A Brief History</h3>
+                    <p class="mb-4">The puzzle's origins are ancient, with one of the earliest mentions found in the
+                        9th-century work of Kashmiri poet and rhetorician, Rudraṭa. However, it was the 18th-century
+                        mathematician <strong class="text-sky-400">Leonhard Euler</strong> who conducted the first
+                        systematic mathematical analysis of the problem. His work laid the foundation for treating the
+                        puzzle not just as a pastime, but as a subject of serious mathematical inquiry, connecting it to
+                        the burgeoning field of graph theory.</p>
+                    <p>In 1823, H. C. von Warnsdorf proposed a simple yet remarkably effective heuristic for finding
+                        tours, a rule that remains one of the most popular methods for solving the puzzle to this day.
+                    </p>
+                </div>
+            </div>
+        </section>
+        <!-- Game -->
+        <section id="game" class="content-section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8">
+                    <div class="game-container">
+                        <h2 class="text-3xl font-bold text-white mb-4 text-center">Interactive DFS Tour Visualizer</h2>
+                        <div class="board" id="board"></div>
+                        <div class="controls">
+                            <button onclick="startKnightTour()">▶️ Start Auto Tour</button>
+                            <button onclick="nextMove()">⏭️ Next Move</button>
+                            <button onclick="resetBoard()">🔄 Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: The Theory -->
+        <section id="theory" class="content-section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h1 class="text-4xl font-bold text-center mb-8 text-white">The Mathematics of the Tour</h1>
+
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">From Chessboard to Graph</h2>
+                    <p class="mb-4">To analyze the Knight's Tour mathematically, we transform the chessboard into a
+                        graph. Each square on the board becomes a <strong class="text-sky-400">vertex</strong>, and a
+                        knight's move between two squares is represented by an <strong
+                            class="text-sky-400">edge</strong> connecting the corresponding vertices. The 8x8 board thus
+                        becomes a graph with 64 vertices.</p>
+                    <p class="mb-4">The Knight's Tour problem is then reframed as finding a specific type of path in
+                        this graph:</p>
+                    <ul class="list-disc list-inside space-y-2 mb-4">
+                        <li>An <strong class="text-white">open tour</strong> is equivalent to finding a <strong
+                                class="text-sky-400">Hamiltonian path</strong> – a path that visits every vertex exactly
+                            once.</li>
+                        <li>A <strong class="text-white">closed tour</strong> is equivalent to finding a <strong
+                                class="text-sky-400">Hamiltonian cycle</strong> – a path that visits every vertex
+                            exactly once and returns to the starting vertex.</li>
+                    </ul>
+                    <div class="my-8 flex justify-center">
+                        <video src="./4.mp4" type="video/mp4" loop autoplay alt="Graph Representation"
+                            class="rounded-lg shadow-lg">
+                    </div>
+                    <p>The problem of finding a Hamiltonian cycle is famously NP-complete, meaning that for large
+                        graphs, no efficient (polynomial-time) algorithm is known to solve it. This is why brute-force
+                        searching for a Knight's Tour is computationally infeasible for larger boards.</p>
+                </div>
+
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">Conditions for Existence</h2>
+                    <p class="mb-4">Can a tour exist on any rectangular board? The answer is no. Graph theory provides
+                        elegant proofs for why tours are impossible on certain boards.</p>
+
+                    <div id="accordion-container-theory">
+                        <!-- Accordion Item 1 -->
+                        <div class="border border-gray-700 rounded-lg mb-2">
+                            <div class="accordion-header bg-gray-700/50 p-4 flex justify-between items-center">
+                                <h3 class="font-semibold text-lg text-white">Bipartite Graphs and Odd-Sized Boards</h3>
+                                <span
+                                    class="text-sky-400 text-2xl transform transition-transform duration-300">&plus;</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t border-gray-700">
+                                <p>A knight always moves from a white square to a black square, or vice versa. This
+                                    means the Knight's Tour graph is <strong class="text-sky-400">bipartite</strong>. We
+                                    can partition the 64 vertices into two sets: 32 white-square vertices and 32
+                                    black-square vertices, with edges only existing <b>between</b> these sets, never
+                                    within them.</p>
+                                <p class="mt-2">For a Hamiltonian cycle to exist, the knight must make an even number of
+                                    moves (64) and return to a square of the same color. This is possible. However, on a
+                                    board with an odd number of total squares (e.g., a \(5 \times 5\) board with 25
+                                    squares), a closed tour is impossible. A path of length 24 (visiting 25 squares)
+                                    must end on a square of the opposite color to the start, so it cannot link back to
+                                    form a cycle.</p>
+                            </div>
+                        </div>
+
+                        <!-- Accordion Item 2 -->
+                        <div class="border border-gray-700 rounded-lg mb-2">
+                            <div class="accordion-header bg-gray-700/50 p-4 flex justify-between items-center">
+                                <h3 class="font-semibold text-lg text-white">Schwenk's Theorem</h3>
+                                <span
+                                    class="text-sky-400 text-2xl transform transition-transform duration-300">&plus;</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t border-gray-700">
+                                <p>In 1991, Allen Schwenk provided a complete characterization for the existence of a
+                                    closed knight's tour on an \(m \times n\) board (with \(m \le n\)):</p>
+                                <div class="math-formula">A closed knight's tour exists if and only if all of the
+                                    following conditions hold:
+                                    <ol class="list-decimal list-inside space-y-2 text-lg text-left mt-4 pl-4">
+                                        <li>\(m\) and \(n\) are not both odd.</li>
+                                        <li>\(m \notin \{1, 2, 4\}\).</li>
+                                        <li>\(m=3\) and \(n \notin \{4, 6, 8\}\).</li>
+                                    </ol>
+                                </div>
+                                <p class="mt-2">This theorem elegantly summarizes which rectangular boards are
+                                    "tourable." Our standard 8x8 board satisfies these conditions, so closed tours are
+                                    possible.</p>
+                            </div>
+                        </div>
+
+                        <!-- Accordion Item 3 -->
+                        <div class="border border-gray-700 rounded-lg mb-2">
+                            <div class="accordion-header bg-gray-700/50 p-4 flex justify-between items-center">
+                                <h3 class="font-semibold text-lg text-white">Proof Sketch for \(4 \times N\) Boards</h3>
+                                <span
+                                    class="text-sky-400 text-2xl transform transition-transform duration-300">&plus;</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t border-gray-700">
+                                <p>The proof for why a \(4 \times N\) board has no closed tour is particularly clever.
+                                    Let's color the squares not by black and white, but by which rows they can reach.
+                                </p>
+                                <ul class="list-disc list-inside space-y-2 mt-2">
+                                    <li>Let Set A be the squares in rows 1 and 4.</li>
+                                    <li>Let Set B be the squares in rows 2 and 3.</li>
+                                </ul>
+                                <p class="mt-2">A knight on a square in Set A can *only* move to a square in Set B. A
+                                    knight in Set B can *only* move to a square in Set A. Therefore, any tour must
+                                    alternate between Set A and Set B. For a closed tour, this implies there must be an
+                                    equal number of squares in Set A and Set B. On a \(4 \times N\) board, there are
+                                    \(2N\) squares in each set, so this condition is met.</p>
+                                <p class="mt-2">However, we can further divide the sets. Let's color the squares of Set
+                                    A with colors \(a_1\) and \(a_2\), and Set B with \(b_1\) and \(b_2\) based on which
+                                    squares they can access. It can be shown that from a square of color \(a_1\), a
+                                    knight can only jump to squares of color \(b_1\). A key insight by Louis Pósa shows
+                                    that the number of squares of these specific colors are unequal, creating a
+                                    contradiction and proving no such tour can exist.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Solutions -->
+        <section id="solutions" class="content-section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h1 class="text-4xl font-bold text-center mb-8 text-white">Solving the Tour</h1>
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">Warnsdorff's Rule</h2>
+                    <p class="mb-4">Since a brute-force search is impractical, we turn to heuristics. The most famous is
+                        Warnsdorff's Rule, a "greedy" algorithm:</p>
+                    <div class="math-formula">From the current square, always move to the available adjacent square that
+                        has the <strong class="text-sky-400">fewest onward moves</strong>.</div>
+                    <p>In graph theory terms, this means moving to the unvisited neighbor vertex with the lowest degree.
+                        This simple rule is remarkably effective at finding a tour (though not guaranteed to find a
+                        closed one). The intuition is that by moving to the most "constrained" squares first, you handle
+                        the difficult parts of the board early, leaving the more accessible squares with many exit
+                        routes for later in the tour, thus avoiding getting trapped.</p>
+                    <div class="my-8 flex justify-center">
+                        <img src="./3.gif" alt="Warnsdorff's Rule" class="rounded-lg shadow-lg">
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">Divide and Conquer: The Method of Quartes</h2>
+                    <p class="mb-4">A more structured approach involves dividing the board into smaller sections and
+                        constructing paths within them. H.J.R. Murray's extensive work analyzes tours by breaking them
+                        into 16 four-cell chains called <strong class="text-sky-400">quartes</strong>. </p>
+                    <p class="mb-4">The process involves:</p>
+                    <ol class="list-decimal list-inside space-y-2">
+                        <li><strong>Matrix Construction:</strong> Designing a "matrix" that lays out the 16 quartes
+                            across the board.</li>
+                        <li><strong>Linking:</strong> Determining if the endpoints of these quartes can be linked
+                            together to form a single, continuous tour.</li>
+                        <li><strong>Testing:</strong> Verifying if the resulting tour has the desired properties (e.g.,
+                            if it's a closed tour or if it forms a magic square).</li>
+                    </ol>
+                    <p class="mt-4">This method is less of a direct algorithm and more of a powerful analytical
+                        framework. It allows for the classification and construction of tours with specific symmetries
+                        and properties, which is crucial for investigating magic tours.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Magic Tours -->
+        <section id="magic" class="content-section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h1 class="text-4xl font-bold text-center mb-8 text-white">The Quest for a Magic Square</h1>
+
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">What is a Magic Tour?</h2>
+                    <p class="mb-4">A <strong class="text-sky-400">magic square</strong> is a grid of numbers where the
+                        sum of the numbers in each row, each column, and both main diagonals is the same. This sum is
+                        called the "magic constant". For an \(n \times n\) board, the magic constant is given by the
+                        formula:</p>
+                    <div class="math-formula">$$M_n = \frac{n(n^2+1)}{2}$$</div>
+                    <p>For a standard \(8 \times 8\) board, the magic constant is 260. A <strong
+                            class="text-white">magic knight's tour</strong> is a knight's tour where the numbers
+                        assigned to the squares (1 for the start, 2 for the second move, ..., 64 for the last) form a
+                        magic square. This is an extremely difficult condition to satisfy, and for a long time, it was
+                        unknown if one even existed.</p>
+                </div>
+
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">The Anatomy of a Magic Tour</h2>
+                    <p class="mb-4">The construction and analysis of magic tours, largely pioneered by H.J.R. Murray,
+                        involves sophisticated concepts that break down the tour's structure.</p>
+
+                    <div id="accordion-container-magic">
+                        <!-- Accordion Item 1 -->
+                        <div class="border border-gray-700 rounded-lg mb-2">
+                            <div class="accordion-header bg-gray-700/50 p-4 flex justify-between items-center">
+                                <h3 class="font-semibold text-lg text-white">Contraparallel Chains</h3>
+                                <span
+                                    class="text-sky-400 text-2xl transform transition-transform duration-300">&plus;</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t border-gray-700">
+                                <p>This is a key concept for constructing magic squares. Two chains of moves in a tour
+                                    are <strong class="text-sky-400">contraparallel</strong> if they are on the same set
+                                    of columns (or rows) but are traversed in opposite directions. For example, the
+                                    chain of moves from 1 to 8 and the chain from 60 down to 53.</p>
+                                <p class="mt-2">The power of this is that a pair of contraparallel chains contributes a
+                                    constant sum to each column they occupy. If a tour can be decomposed entirely into
+                                    pairs of such chains, it greatly increases the chances of it being magic.</p>
+                            </div>
+                        </div>
+
+                        <!-- Accordion Item 2 -->
+                        <div class="border border-gray-700 rounded-lg mb-2">
+                            <div class="accordion-header bg-gray-700/50 p-4 flex justify-between items-center">
+                                <h3 class="font-semibold text-lg text-white">Regular vs. Irregular Tours</h3>
+                                <span
+                                    class="text-sky-400 text-2xl transform transition-transform duration-300">&plus;</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t border-gray-700">
+                                <p>Murray classifies tours based on the geometric shapes of their underlying "quartes"
+                                    (4-move chains). Tours composed entirely of standard shapes (squares, diamonds, and
+                                    a type called "beverley") are called <strong class="text-sky-400">regular
+                                        tours</strong>. These have highly predictable mathematical properties that make
+                                    them easier to analyze for magic properties.</p>
+                                <p class="mt-2">Tours that use other, non-standard quarte shapes are called <strong
+                                        class="text-sky-400">irregular tours</strong>. While they lack the neat
+                                    structure of regular tours, they can still be magic. The discovery and
+                                    classification of these tours is a complex area of study.</p>
+                            </div>
+                        </div>
+
+                        <!-- Accordion Item 3 -->
+                        <div class="border border-gray-700 rounded-lg mb-2">
+                            <div class="accordion-header bg-gray-700/50 p-4 flex justify-between items-center">
+                                <h3 class="font-semibold text-lg text-white">Semi-Magic Tours</h3>
+                                <span
+                                    class="text-sky-400 text-2xl transform transition-transform duration-300">&plus;</span>
+                            </div>
+                            <div class="accordion-content p-4 border-t border-gray-700">
+                                <p>When a full magic tour is not possible or hasn't been found, mathematicians study
+                                    tours with weaker magic properties:</p>
+                                <ul class="list-disc list-inside space-y-2 mt-2">
+                                    <li><strong class="text-white">Semi-magic:</strong> The rows sum to the magic
+                                        constant, but the columns do not (or vice-versa).</li>
+                                    <li><strong class="text-white">Quasi-magic:</strong> A semi-magic tour where the
+                                        non-magic lines add up to only two different values.</li>
+                                </ul>
+                                <p class="mt-2">These variations are particularly important when studying boards of
+                                    different sizes (e.g., \(10 \times 10\)) or non-rectangular boards where full magic
+                                    tours are proven to be impossible.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Applications -->
+        <section id="applications" class="content-section">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h1 class="text-4xl font-bold text-center mb-8 text-white">Applications & References</h1>
+
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8 mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">Applications in Research and Computer Science</h2>
+                    <p class="mb-4">While often viewed as a recreational puzzle, the Knight's Tour and the underlying
+                        principles of Hamiltonian paths have applications in various fields:</p>
+                    <ul class="list-disc list-inside space-y-3">
+                        <li><strong class="text-white">Algorithm Design:</strong> It serves as a classic benchmark
+                            problem for backtracking algorithms, heuristics, and optimization techniques.</li>
+                        <li><strong class="text-white">Cryptography:</strong> The concept of creating complex,
+                            non-repeating paths has been explored in generating pseudo-random numbers and designing
+                            cryptographic systems.</li>
+                        <li><strong class="text-white">Network Routing:</strong> Finding an optimal path that visits a
+                            series of nodes without repetition is a core problem in computer networking and logistics
+                            (similar to the Traveling Salesperson Problem).</li>
+                        <li><strong class="text-white">DNA Sequencing:</strong> Graph theory methods, analogous to
+                            finding paths in the Knight's Tour graph, are used to assemble fragments of DNA into a
+                            complete sequence.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-800 shadow-xl rounded-lg p-8">
+                    <h2 class="text-3xl font-bold text-white mb-4">References</h2>
+                    <ul class="list-disc list-inside space-y-2 text-gray-400">
+                        <li>Schwenk, A. (1991). Which Rectangular Chessboards Have a Knight’s Tour? <em
+                                class="italic">Mathematics Magazine, 64</em>, 325–332.</li>
+                        <li>Honsberger, R. (1973). <em class="italic">Mathematical Gems</em>. Mathematical Association
+                            of America.</li>
+                        <li>Murray, H.J.R. (1942). <em class="italic">The Knight's Tour</em>. Unpublished manuscript.
+                        </li>
+                        <li>Murray, H.J.R. (1951). <em class="italic">The Knight's Tour</em>. Unpublished manuscript,
+                            revised.</li>
+                        <li>Warnsdorf, H. C. von. (1823). <em class="italic">Des Rösselsprungs einfachste und
+                                allgemeinste Lösung</em>. Schmalkalden.</li>
+                        <li> <a href=https://neeldhara.courses/2025/02-es214/"">ES 214 website and inspiration for
+                                content</a></li>
+                        <li><a
+                                href="https://www.chess.com/blog/Lord_Hammer/the-knights-tour-problem-chess-and-math-combined">Chess.com</a>
+                        </li>
+                        <li>
+                            Brady Haran, <em>Knight's Tour - Numberphile</em>,
+                            <a href="https://www.youtube.com/watch?v=ab_dY3dZFHM" target="_blank">YouTube</a>,
+                            published Jan 16, 2014.
+                        </li>
+
+                    </ul>
+                    <div class="youtube-embed">
+                        <iframe width="560" height="315"
+                            src="https://www.youtube-nocookie.com/embed/ab_dY3dZFHM?si=fgoM68wsJn18uS0D"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-400">
+            <p>&copy; 2025 Lakshya Kesarwani & Manan Chavda</p>
+            <p>A Summer of Maths Exposition Project at IIT Gandhinagar</p>
+        </div>
+    </footer>
+
+
+    <script>
+        // --- Accordion functionality ---
+        function setupAccordion(containerId) {
+            const accordionContainer = document.getElementById(containerId);
+            if (!accordionContainer) return;
+
+            const headers = accordionContainer.querySelectorAll('.accordion-header');
+
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('span');
+                    const isExpanded = content.style.maxHeight;
+
+                    // Close all accordions in the same container before opening a new one
+                    headers.forEach(otherHeader => {
+                        if (otherHeader !== header) {
+                            otherHeader.nextElementSibling.style.maxHeight = null;
+                            const otherIcon = otherHeader.querySelector('span');
+                            otherIcon.textContent = '+';
+                            otherIcon.classList.remove('rotate-45');
+                        }
+                    });
+
+                    // Toggle the clicked accordion
+                    if (isExpanded) {
+                        content.style.maxHeight = null;
+                        icon.textContent = '+';
+                        icon.classList.remove('rotate-45');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.textContent = '+';
+                        icon.classList.add('rotate-45');
+                    }
+                });
+            });
+        }
+
+        // --- Navbar active link on scroll ---
+        const sections = document.querySelectorAll('.content-section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function updateActiveLink() {
+            let index = sections.length;
+
+            while (--index && window.scrollY + 100 < sections[index].offsetTop) { }
+
+            navLinks.forEach((link) => link.classList.remove('active'));
+
+            // Check if the link exists before trying to add a class
+            const activeLink = document.querySelector(`.nav-link[href="#${sections[index].id}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        }
+
+        // --- Initial setup on document load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setupAccordion('accordion-container-theory');
+            setupAccordion('accordion-container-magic');
+
+            // Listen for scroll events to update nav
+            window.addEventListener('scroll', updateActiveLink);
+
+            // Run once on load
+            updateActiveLink();
+        });
+    </script>
+    <script>
+        const boardEl = document.getElementById("board");
+        const boardSize = 8;
+        const gameCells = [];
+        const knightMoves = [
+            [-2, -1], [-1, -2], [1, -2], [2, -1],
+            [2, 1], [1, 2], [-1, 2], [-2, 1]
+        ];
+
+        let visited;
+        let path = [];
+        let currentStep = 0;
+        let knightRow = 0, knightCol = 0;
+        let delay = 150;
+        let autoAbort = false;
+
+        // Initialize board
+        for (let r = 0; r < boardSize; r++) {
+            for (let c = 0; c < boardSize; c++) {
+                const cell = document.createElement("div");
+                const isDark = (r + c) % 2 === 1;
+                cell.className = `cell ${isDark ? "dark" : "light"}`;
+                boardEl.appendChild(cell);
+                gameCells.push(cell);
+            }
+        }
+
+        function getIndex(r, c) {
+            return r * boardSize + c;
+        }
+
+        function clearBoard() {
+            for (let i = 0; i < boardSize * boardSize; i++) {
+                gameCells[i].className = `cell ${(Math.floor(i / 8) + i % 8) % 2 === 1 ? "dark" : "light"}`;
+                gameCells[i].textContent = '';
+            }
+        }
+
+        function resetBoard() {
+            autoAbort = true; // Abort any ongoing auto tour
+            setTimeout(() => { // Allow tour to stop before resetting
+                autoAbort = false;
+                clearBoard();
+                visited = Array.from({ length: boardSize }, () => Array(boardSize).fill(false));
+                path = [];
+                currentStep = 0;
+                knightRow = 0;
+                knightCol = 0;
+                generatePath(knightRow, knightCol, [...visited.map(row => [...row])]);
+                renderKnight();
+            }, delay);
+        }
+
+        function renderKnight() {
+            clearBoard();
+            for (let i = 0; i < currentStep; i++) {
+                const [r, c] = path[i];
+                const idx = getIndex(r, c);
+                gameCells[idx].classList.add("visited");
+                gameCells[idx].textContent = i + 1;
+            }
+
+            if (currentStep < path.length) {
+                const [r, c] = path[currentStep];
+                const idx = getIndex(r, c);
+                gameCells[idx].classList.add("knight");
+                gameCells[idx].textContent = "♞";
+            }
+        }
+
+        // This is a simple path generator, not a full tour finder.
+        // It performs a basic depth-first search to create a path for demonstration.
+        function generatePath(r, c, visited) {
+            if (path.length >= boardSize * boardSize) return;
+            visited[r][c] = true;
+            path.push([r, c]);
+
+            for (const [dr, dc] of knightMoves) {
+                const nr = r + dr;
+                const nc = c + dc;
+                if (nr >= 0 && nr < boardSize && nc >= 0 && nc < boardSize && !visited[nr][nc]) {
+                    generatePath(nr, nc, visited);
+                }
+            }
+        }
+
+        async function knightTourDFS(r, c, visited, moveNum) {
+            if (autoAbort || moveNum > boardSize * boardSize) return;
+
+            const idx = getIndex(r, c);
+            gameCells[idx].classList.add("knight");
+            gameCells[idx].textContent = "♞";
+            await new Promise(resolve => setTimeout(resolve, delay));
+
+            if (autoAbort) {
+                gameCells[idx].classList.remove("knight");
+                gameCells[idx].textContent = "";
+                return;
+            }
+
+            gameCells[idx].classList.remove("knight");
+            gameCells[idx].classList.add("visited");
+            gameCells[idx].textContent = moveNum;
+            visited[r][c] = true;
+
+            // Simplified for visualization: Just find the next valid move
+            for (const [dr, dc] of knightMoves) {
+                const nr = r + dr;
+                const nc = c + dc;
+                if (nr >= 0 && nr < boardSize && nc >= 0 && nc < boardSize && !visited[nr][nc]) {
+                    await knightTourDFS(nr, nc, visited, moveNum + 1);
+                    if (autoAbort) return;
+                }
+            }
+        }
+
+        async function startKnightTour() {
+            if (autoAbort) return; // Prevent multiple runs
+            autoAbort = false;
+            clearBoard();
+            const localVisited = Array.from({ length: boardSize }, () => Array(boardSize).fill(false));
+            await knightTourDFS(0, 0, localVisited, 1);
+            autoAbort = false;
+        }
+
+        function nextMove() {
+            if (autoAbort) resetBoard();
+            if (currentStep < path.length - 1) {
+                currentStep++;
+                renderKnight();
+            }
+        }
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            resetBoard();
+        });
+    </script>
+</body>
+
+</html>

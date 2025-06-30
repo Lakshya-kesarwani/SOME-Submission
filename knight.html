@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Knight Tour Visualizer</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #1e293b;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding-top: 20px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 60px);
+      grid-template-rows: repeat(8, 60px);
+      border: 2px solid white;
+    }
+
+    .cell {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .light { background-color: #f3f4f6; color: black; }
+    .dark { background-color: #4b5563; }
+    .visited { background-color: #facc15 !important; color: black; }
+    .knight { background-color: #10b981 !important; color: white; font-weight: bold; }
+
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 18px;
+      background-color: #3b82f6;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+
+<h1>♞ Knight DFS Tour Visualizer</h1>
+<div class="board" id="board"></div>
+
+<div class="controls">
+  <button onclick="startKnightTour()">▶️ Start Auto Tour</button>
+  <button onclick="nextMove()">⏭️ Next Move</button>
+  <button onclick="resetBoard()">🔄 Reset</button>
+</div>
+
+<script>
+  const boardEl = document.getElementById("board");
+  const boardSize = 8;
+  const cells = [];
+  const knightMoves = [
+    [-2, -1], [-1, -2], [1, -2], [2, -1],
+    [2, 1], [1, 2], [-1, 2], [-2, 1]
+  ];
+
+  let visited;
+  let path = [];
+  let currentStep = 0;
+  let knightRow = 0, knightCol = 0;
+  let delay = 150;
+  let runningAuto = false;
+  let autoAbort = false;
+
+  // Initialize board
+  for (let r = 0; r < boardSize; r++) {
+    for (let c = 0; c < boardSize; c++) {
+      const cell = document.createElement("div");
+      const isDark = (r + c) % 2 === 1;
+      cell.className = `cell ${isDark ? "dark" : "light"}`;
+      boardEl.appendChild(cell);
+      cells.push(cell);
+    }
+  }
+
+  function getIndex(r, c) {
+    return r * boardSize + c;
+  }
+
+  function clearBoard() {
+    for (let i = 0; i < boardSize * boardSize; i++) {
+      cells[i].className = `cell ${(Math.floor(i / 8) + i % 8) % 2 === 1 ? "dark" : "light"}`;
+      cells[i].textContent = '';
+    }
+  }
+
+  function resetBoard() {
+    // Abort ongoing auto DFS
+    autoAbort = true;
+    runningAuto = false;
+
+    clearBoard();
+    visited = Array.from({ length: boardSize }, () => Array(boardSize).fill(false));
+    path = [];
+    currentStep = 0;
+    knightRow = 0;
+    knightCol = 0;
+    generatePath(knightRow, knightCol, visited);
+    renderKnight();
+  }
+
+  function renderKnight() {
+    clearBoard();
+    for (let i = 0; i < currentStep; i++) {
+      const [r, c] = path[i];
+      const idx = getIndex(r, c);
+      cells[idx].classList.add("visited");
+      cells[idx].textContent = i + 1;
+    }
+
+    if (currentStep < path.length) {
+      const [r, c] = path[currentStep];
+      const idx = getIndex(r, c);
+      cells[idx].classList.add("knight");
+      cells[idx].textContent = "♞";
+    }
+  }
+
+  function generatePath(r, c, visited) {
+    visited[r][c] = true;
+    path.push([r, c]);
+
+    for (const [dr, dc] of knightMoves) {
+      const nr = r + dr;
+      const nc = c + dc;
+      if (nr >= 0 && nr < boardSize && nc >= 0 && nc < boardSize && !visited[nr][nc]) {
+        generatePath(nr, nc, visited);
+      }
+    }
+  }
+
+  async function knightTourDFS(r, c, visited, moveNum) {
+    if (autoAbort) return;
+
+    const idx = getIndex(r, c);
+    cells[idx].classList.add("knight");
+    cells[idx].textContent = "♞";
+    await new Promise(resolve => setTimeout(resolve, delay));
+
+    if (autoAbort) return;
+
+    cells[idx].classList.remove("knight");
+    cells[idx].classList.add("visited");
+    cells[idx].textContent = moveNum;
+
+    visited[r][c] = true;
+
+    for (const [dr, dc] of knightMoves) {
+      const nr = r + dr;
+      const nc = c + dc;
+      if (
+        nr >= 0 &&
+        nr < boardSize &&
+        nc >= 0 &&
+        nc < boardSize &&
+        !visited[nr][nc]
+      ) {
+        await knightTourDFS(nr, nc, visited, moveNum + 1);
+        if (autoAbort) return;
+      }
+    }
+  }
+
+  async function startKnightTour() {
+    resetBoard(); // clean reset
+    autoAbort = false;
+    runningAuto = true;
+    visited = Array.from({ length: boardSize }, () => Array(boardSize).fill(false));
+    await knightTourDFS(0, 0, visited, 1);
+    runningAuto = false;
+  }
+
+  function nextMove() {
+    if (currentStep < path.length) {
+      renderKnight();
+      currentStep++;
+    }
+  }
+
+  // initial setup
+  resetBoard();
+</script>
+
+</body>
+</html>
